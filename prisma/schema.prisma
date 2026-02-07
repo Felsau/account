@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ผู้ใช้งาน
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  records Record[]
+}
+
+// รายรับ-รายจ่าย
+model Record {
+  id          String   @id @default(cuid())
+  type        String   // income = รายรับ, expense = รายจ่าย
+  amount      Float
+  category    String   // หมวดหมู่ เช่น อาหาร, เดินทาง, เงินเดือน
+  description String   // รายละเอียด
+  date        DateTime
+  note        String?  // หมายเหตุ (ไม่บังคับ)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+
+  user User @relation(fields: [userId], references: [id])
+}
