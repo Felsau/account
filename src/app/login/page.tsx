@@ -39,30 +39,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-emerald-950">
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/8 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/8 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-emerald-600/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md mx-4">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-2xl mb-4 shadow-lg shadow-emerald-600/30">
-            <span className="text-3xl">📊</span>
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-18 h-18 bg-linear-to-br from-emerald-500 to-teal-600 rounded-2xl mb-5 shadow-2xl shadow-emerald-600/25">
+            <span className="text-4xl">📊</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">ระบบบัญชี</h1>
-          <p className="text-slate-400 text-sm mt-1">เข้าสู่ระบบเพื่อจัดการบัญชีของคุณ</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">ระบบบัญชี</h1>
+          <p className="text-slate-400 text-sm mt-2">เข้าสู่ระบบเพื่อจัดการบัญชีของคุณ</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/10">
+        <div className="bg-white/7 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-300 text-sm flex items-center gap-2">
-                <span className="text-red-400">⚠️</span>
+              <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3 text-rose-300 text-sm flex items-center gap-2 font-medium">
+                <span className="text-rose-400">⚠️</span>
                 {error}
               </div>
             )}
@@ -71,7 +72,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
+                className="block text-sm font-medium text-slate-300 mb-2"
               >
                 อีเมล
               </label>
@@ -82,7 +83,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
+                className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
               />
             </div>
 
@@ -90,7 +91,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
+                className="block text-sm font-medium text-slate-300 mb-2"
               >
                 รหัสผ่าน
               </label>
@@ -102,12 +103,12 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors pr-11"
+                  className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors p-1"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -118,7 +119,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20"
+              className="w-full bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-emerald-500/50 disabled:to-teal-500/50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/20 hover:shadow-2xl hover:shadow-emerald-600/30"
             >
               {loading ? (
                 <>
@@ -136,7 +137,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-slate-500 text-xs mt-6">
+        <p className="text-center text-slate-600 text-xs mt-8">
           © 2026 ระบบบัญชี — Felsau
         </p>
       </div>

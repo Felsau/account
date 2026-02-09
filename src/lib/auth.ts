@@ -43,13 +43,27 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 วัน
+  },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 30 * 24 * 60 * 60, // 30 วัน
+      },
+    },
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
+      // อัปเดต iat ทุกครั้งที่มีการใช้งาน เพื่อต่ออายุ token
+      token.iat = Math.floor(Date.now() / 1000);
       return token;
     },
     async session({ session, token }) {
@@ -62,5 +76,5 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET || "super-secret-key-change-in-production",
+  secret: process.env.NEXTAUTH_SECRET,
 };

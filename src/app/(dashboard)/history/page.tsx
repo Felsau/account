@@ -5,9 +5,11 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Trash2,
+  Pencil,
   Filter,
 } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
+import EditRecordModal from "@/components/EditRecordModal";
 
 interface Record {
   id: string;
@@ -23,6 +25,7 @@ export default function HistoryPage() {
   const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "income" | "expense">("all");
+  const [editingRecord, setEditingRecord] = useState<Record | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -84,7 +87,7 @@ export default function HistoryPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">ประวัติรายการ</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight">ประวัติรายการ</h1>
       </div>
 
       {/* Filters */}
@@ -93,10 +96,10 @@ export default function HistoryPage() {
           type="month"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
+          className="bg-white border border-gray-200/60 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
         />
 
-        <div className="flex bg-white rounded-lg border border-gray-200 p-0.5">
+        <div className="flex bg-white rounded-xl border border-gray-200/60 p-1 gap-0.5">
           {[
             { value: "all", label: "ทั้งหมด" },
             { value: "income", label: "รายรับ" },
@@ -106,10 +109,10 @@ export default function HistoryPage() {
               key={item.value}
               onClick={() => setFilter(item.value as typeof filter)}
               className={cn(
-                "px-4 py-1.5 rounded-md text-sm transition-colors",
+                "px-4 py-1.5 rounded-lg text-sm transition-all duration-200 font-medium",
                 filter === item.value
-                  ? "bg-emerald-600 text-white"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-sm shadow-emerald-200/50"
+                  : "text-gray-400 hover:text-gray-600"
               )}
             >
               {item.label}
@@ -119,17 +122,17 @@ export default function HistoryPage() {
       </div>
 
       {/* Summary bar */}
-      <div className="flex gap-4 text-sm">
-        <span className="text-green-600 font-medium">
+      <div className="flex flex-wrap gap-3 sm:gap-5 text-xs sm:text-sm">
+        <span className="text-emerald-600 font-semibold">
           รายรับ: +{formatCurrency(totalIncome)}
         </span>
-        <span className="text-red-600 font-medium">
+        <span className="text-rose-600 font-semibold">
           รายจ่าย: -{formatCurrency(totalExpense)}
         </span>
         <span
           className={cn(
-            "font-medium",
-            totalIncome - totalExpense >= 0 ? "text-blue-600" : "text-red-600"
+            "font-semibold",
+            totalIncome - totalExpense >= 0 ? "text-blue-600" : "text-rose-600"
           )}
         >
           คงเหลือ: {formatCurrency(totalIncome - totalExpense)}
@@ -138,11 +141,16 @@ export default function HistoryPage() {
 
       {/* Records */}
       {loading ? (
-        <div className="text-center py-12 text-gray-400">กำลังโหลด...</div>
+        <div className="text-center py-12">
+          <div className="w-8 h-8 border-3 border-emerald-200 border-t-emerald-500 rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-gray-400 text-sm">กำลังโหลด...</p>
+        </div>
       ) : records.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <Filter size={40} className="mx-auto mb-2 text-gray-300" />
-          <p>ไม่พบรายการ</p>
+        <div className="text-center py-16">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+            <Filter size={24} className="text-gray-300" />
+          </div>
+          <p className="text-gray-400 font-medium">ไม่พบรายการ</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -155,17 +163,17 @@ export default function HistoryPage() {
             return (
               <div
                 key={dateKey}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm border border-gray-100/80 overflow-hidden"
               >
                 {/* Date header */}
-                <div className="px-5 py-2.5 bg-gray-50 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">
+                <div className="px-4 sm:px-6 py-3 bg-gray-50/80 flex items-center justify-between">
+                  <span className="text-sm font-semibold text-gray-500">
                     {formatDate(dateKey)}
                   </span>
                   <span
                     className={cn(
-                      "text-sm font-medium",
-                      dayTotal >= 0 ? "text-green-600" : "text-red-600"
+                      "text-sm font-semibold tabular-nums",
+                      dayTotal >= 0 ? "text-emerald-600" : "text-rose-600"
                     )}
                   >
                     {dayTotal >= 0 ? "+" : ""}
@@ -174,58 +182,66 @@ export default function HistoryPage() {
                 </div>
 
                 {/* Items */}
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-gray-50/80">
                   {dayRecords.map((record) => (
                     <div
                       key={record.id}
-                      className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 hover:bg-gray-50/60 transition-all duration-200"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                         <div
                           className={cn(
-                            "w-8 h-8 rounded-full flex items-center justify-center",
+                            "w-9 h-9 rounded-xl flex items-center justify-center",
                             record.type === "income"
-                              ? "bg-green-100"
-                              : "bg-red-100"
+                              ? "bg-emerald-50"
+                              : "bg-rose-50"
                           )}
                         >
                           {record.type === "income" ? (
                             <ArrowUpRight
                               size={16}
-                              className="text-green-600"
+                              className="text-emerald-500"
                             />
                           ) : (
                             <ArrowDownRight
                               size={16}
-                              className="text-red-600"
+                              className="text-rose-500"
                             />
                           )}
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-800">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-700 truncate">
                             {record.description}
                           </p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-400 mt-0.5 truncate">
                             {record.category}
                             {record.note ? ` · ${record.note}` : ""}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <span
                           className={cn(
-                            "text-sm font-semibold",
+                            "text-sm font-semibold tabular-nums",
                             record.type === "income"
-                              ? "text-green-600"
-                              : "text-red-600"
+                              ? "text-emerald-600"
+                              : "text-rose-600"
                           )}
                         >
                           {record.type === "income" ? "+" : "-"}
                           {formatCurrency(record.amount)}
                         </span>
                         <button
+                          onClick={() => setEditingRecord(record)}
+                          className="p-1.5 text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                          title="แก้ไข"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
                           onClick={() => handleDelete(record.id)}
-                          className="p-1 text-gray-300 hover:text-red-500 transition-colors"
+                          className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all duration-200"
+                          title="ลบ"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -237,6 +253,18 @@ export default function HistoryPage() {
             );
           })}
         </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingRecord && (
+        <EditRecordModal
+          record={editingRecord}
+          onClose={() => setEditingRecord(null)}
+          onSaved={() => {
+            setEditingRecord(null);
+            fetchData();
+          }}
+        />
       )}
     </div>
   );

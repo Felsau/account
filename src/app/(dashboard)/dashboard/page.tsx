@@ -7,11 +7,13 @@ import {
   Wallet,
   Plus,
   Trash2,
+  Pencil,
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency, cn } from "@/lib/utils";
+import EditRecordModal from "@/components/EditRecordModal";
 
 interface Record {
   id: string;
@@ -37,6 +39,7 @@ export default function DashboardPage() {
     balance: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [editingRecord, setEditingRecord] = useState<Record | null>(null);
 
   const fetchData = async () => {
     try {
@@ -74,7 +77,10 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-400">กำลังโหลด...</div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-emerald-200 border-t-emerald-500 rounded-full animate-spin"></div>
+          <p className="text-gray-400 text-sm">กำลังโหลด...</p>
+        </div>
       </div>
     );
   }
@@ -82,10 +88,10 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Title */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">สรุปเดือนนี้</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight">สรุปเดือนนี้</h1>
+          <p className="text-xs sm:text-sm text-gray-400 mt-0.5">
             {new Date().toLocaleDateString("th-TH", {
               month: "long",
               year: "numeric",
@@ -94,50 +100,50 @@ export default function DashboardPage() {
         </div>
         <Link
           href="/add"
-          className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm"
+          className="flex items-center gap-1.5 sm:gap-2 bg-linear-to-r from-emerald-500 to-teal-500 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 text-xs sm:text-sm font-medium shadow-md shadow-emerald-200/50 hover:shadow-lg hover:shadow-emerald-200/60 shrink-0"
         >
           <Plus size={18} />
-          เพิ่มรายการ
+          <span className="hidden sm:inline">เพิ่มรายการ</span>
         </Link>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">รายรับ</span>
-            <div className="p-2 bg-green-100 rounded-lg">
-              <TrendingUp size={18} className="text-green-600" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 hover:shadow-lg hover:shadow-emerald-50 transition-all duration-300 group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-500 tracking-wide">รายรับ</span>
+            <div className="p-2.5 bg-linear-to-br from-emerald-400 to-green-500 rounded-xl shadow-sm shadow-emerald-200/50 group-hover:scale-110 transition-transform duration-300">
+              <TrendingUp size={18} className="text-white" />
             </div>
           </div>
-          <p className="text-xl font-bold text-green-600">
+          <p className="text-2xl font-bold text-emerald-600 tracking-tight">
             +{formatCurrency(summary.totalIncome)}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">รายจ่าย</span>
-            <div className="p-2 bg-red-100 rounded-lg">
-              <TrendingDown size={18} className="text-red-600" />
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 hover:shadow-lg hover:shadow-rose-50 transition-all duration-300 group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-500 tracking-wide">รายจ่าย</span>
+            <div className="p-2.5 bg-linear-to-br from-rose-400 to-red-500 rounded-xl shadow-sm shadow-rose-200/50 group-hover:scale-110 transition-transform duration-300">
+              <TrendingDown size={18} className="text-white" />
             </div>
           </div>
-          <p className="text-xl font-bold text-red-600">
+          <p className="text-2xl font-bold text-rose-600 tracking-tight">
             -{formatCurrency(summary.totalExpense)}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">คงเหลือ</span>
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Wallet size={18} className="text-blue-600" />
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300 group">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-500 tracking-wide">คงเหลือ</span>
+            <div className="p-2.5 bg-linear-to-br from-blue-400 to-indigo-500 rounded-xl shadow-sm shadow-blue-200/50 group-hover:scale-110 transition-transform duration-300">
+              <Wallet size={18} className="text-white" />
             </div>
           </div>
           <p
             className={cn(
-              "text-xl font-bold",
-              summary.balance >= 0 ? "text-blue-600" : "text-red-600"
+              "text-2xl font-bold tracking-tight",
+              summary.balance >= 0 ? "text-blue-600" : "text-rose-600"
             )}
           >
             {formatCurrency(summary.balance)}
@@ -146,73 +152,84 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Records */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-semibold text-gray-800">รายการล่าสุด</h2>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 overflow-hidden">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100/80 flex items-center justify-between">
+          <h2 className="font-semibold text-gray-800 tracking-tight text-sm sm:text-base">รายการล่าสุด</h2>
           <Link
             href="/history"
-            className="text-sm text-emerald-600 hover:text-emerald-700"
+            className="text-sm text-emerald-500 hover:text-emerald-600 font-medium transition-colors"
           >
             ดูทั้งหมด →
           </Link>
         </div>
 
         {records.length === 0 ? (
-          <div className="p-8 text-center text-gray-400">
-            <p>ยังไม่มีรายการ</p>
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+              <Wallet size={24} className="text-gray-300" />
+            </div>
+            <p className="text-gray-400 font-medium">ยังไม่มีรายการ</p>
             <Link
               href="/add"
-              className="text-emerald-600 hover:underline text-sm mt-1 inline-block"
+              className="text-emerald-500 hover:text-emerald-600 text-sm mt-2 inline-block font-medium transition-colors"
             >
               เพิ่มรายการแรกของคุณ
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50/80">
             {records.slice(0, 10).map((record) => (
               <div
                 key={record.id}
-                className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 hover:bg-gray-50/60 transition-all duration-200"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   <div
                     className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center",
+                      "w-9 h-9 rounded-xl flex items-center justify-center",
                       record.type === "income"
-                        ? "bg-green-100"
-                        : "bg-red-100"
+                        ? "bg-emerald-50"
+                        : "bg-rose-50"
                     )}
                   >
                     {record.type === "income" ? (
-                      <ArrowUpRight size={16} className="text-green-600" />
+                      <ArrowUpRight size={16} className="text-emerald-500" />
                     ) : (
-                      <ArrowDownRight size={16} className="text-red-600" />
+                      <ArrowDownRight size={16} className="text-rose-500" />
                     )}
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-700 truncate">
                       {record.description}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-400 mt-0.5 truncate">
                       {record.category} · {formatDate(record.date)}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <span
                     className={cn(
-                      "text-sm font-semibold",
+                      "text-sm font-semibold tabular-nums",
                       record.type === "income"
-                        ? "text-green-600"
-                        : "text-red-600"
+                        ? "text-emerald-600"
+                        : "text-rose-600"
                     )}
                   >
                     {record.type === "income" ? "+" : "-"}
                     {formatCurrency(record.amount)}
                   </span>
                   <button
+                    onClick={() => setEditingRecord(record)}
+                    className="p-1.5 text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                    title="แก้ไข"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  <button
                     onClick={() => handleDelete(record.id)}
-                    className="p-1 text-gray-300 hover:text-red-500 transition-colors"
+                    className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all duration-200"
+                    title="ลบ"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -222,6 +239,18 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {editingRecord && (
+        <EditRecordModal
+          record={editingRecord}
+          onClose={() => setEditingRecord(null)}
+          onSaved={() => {
+            setEditingRecord(null);
+            fetchData();
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -84,15 +84,15 @@ export default function AddRecordPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard"
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200"
         >
-          <ArrowLeft size={20} className="text-gray-600" />
+          <ArrowLeft size={20} className="text-gray-500" />
         </Link>
-        <h1 className="text-xl font-bold text-gray-800">เพิ่มรายการ</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-gray-800 tracking-tight">เพิ่มรายการ</h1>
       </div>
 
       {/* Type Toggle */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1 flex">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-1.5 flex gap-1">
         <button
           type="button"
           onClick={() => {
@@ -100,10 +100,10 @@ export default function AddRecordPage() {
             setCategory("");
           }}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-colors",
+            "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all duration-200",
             type === "expense"
-              ? "bg-red-500 text-white shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-linear-to-r from-rose-500 to-red-500 text-white shadow-md shadow-rose-200/50"
+              : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
           )}
         >
           <TrendingDown size={18} />
@@ -116,10 +116,10 @@ export default function AddRecordPage() {
             setCategory("");
           }}
           className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-colors",
+            "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all duration-200",
             type === "income"
-              ? "bg-green-500 text-white shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-linear-to-r from-emerald-500 to-green-500 text-white shadow-md shadow-emerald-200/50"
+              : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
           )}
         >
           <TrendingUp size={18} />
@@ -130,14 +130,14 @@ export default function AddRecordPage() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-red-600 text-sm">
-            {error}
+          <div className="bg-rose-50 border border-rose-200/60 rounded-xl px-4 py-3 text-rose-600 text-sm font-medium flex items-center gap-2">
+            <span>⚠️</span> {error}
           </div>
         )}
 
         {/* Amount */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <label className="block text-sm font-medium text-gray-600 mb-2">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6">
+          <label className="block text-sm font-medium text-gray-600 mb-2 tracking-wide">
             จำนวนเงิน (บาท)
           </label>
           <input
@@ -147,14 +147,14 @@ export default function AddRecordPage() {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full text-3xl font-bold text-gray-800 outline-none placeholder-gray-300"
+            className="w-full text-3xl font-bold text-gray-800 outline-none placeholder-gray-400 tracking-tight tabular-nums"
             required
           />
         </div>
 
         {/* Category */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <label className="block text-sm font-medium text-gray-600 mb-3">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6">
+          <label className="block text-sm font-medium text-gray-600 mb-3 tracking-wide">
             หมวดหมู่
           </label>
           <div className="flex flex-wrap gap-2">
@@ -164,12 +164,12 @@ export default function AddRecordPage() {
                 type="button"
                 onClick={() => setCategory(cat)}
                 className={cn(
-                  "px-3 py-1.5 rounded-full text-sm transition-colors",
+                  "px-3.5 py-1.5 rounded-full text-sm transition-all duration-200 font-medium",
                   category === cat
                     ? type === "income"
-                      ? "bg-green-500 text-white"
-                      : "bg-red-500 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      ? "bg-linear-to-r from-emerald-500 to-green-500 text-white shadow-sm shadow-emerald-200/50"
+                      : "bg-linear-to-r from-rose-500 to-red-500 text-white shadow-sm shadow-rose-200/50"
+                    : "bg-gray-100/80 text-gray-500 hover:bg-gray-200/60 hover:text-gray-700"
                 )}
               >
                 {cat}
@@ -179,9 +179,9 @@ export default function AddRecordPage() {
         </div>
 
         {/* Description & Date */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5 tracking-wide">
               รายละเอียด
             </label>
             <input
@@ -189,26 +189,26 @@ export default function AddRecordPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="เช่น ข้าวผัดกระเพรา, ค่ารถไฟฟ้า..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
+              className="w-full border border-gray-200/60 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5 tracking-wide">
               วันที่
             </label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
+              className="w-full border border-gray-200/60 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5 tracking-wide">
               หมายเหตุ (ไม่บังคับ)
             </label>
             <input
@@ -216,7 +216,7 @@ export default function AddRecordPage() {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="บันทึกเพิ่มเติม..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
+              className="w-full border border-gray-200/60 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all"
             />
           </div>
         </div>
@@ -226,10 +226,10 @@ export default function AddRecordPage() {
           type="submit"
           disabled={saving}
           className={cn(
-            "w-full py-3 rounded-xl font-medium text-white transition-colors flex items-center justify-center gap-2",
+            "w-full py-3.5 rounded-2xl font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-lg",
             type === "income"
-              ? "bg-green-600 hover:bg-green-700 disabled:bg-green-400"
-              : "bg-red-600 hover:bg-red-700 disabled:bg-red-400"
+              ? "bg-linear-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 disabled:from-emerald-300 disabled:to-green-300 shadow-emerald-200/50"
+              : "bg-linear-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 disabled:from-rose-300 disabled:to-red-300 shadow-rose-200/50"
           )}
         >
           <Save size={18} />
