@@ -1,39 +1,52 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogIn, Eye, EyeOff, Loader2 } from "lucide-react";
+import { UserPlus, Eye, EyeOff, Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const registered = searchParams.get("registered");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (password.length < 6) {
+      setError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
       });
 
-      if (result?.error) {
-        setError(result.error);
-      } else {
-        router.push("/dashboard");
-        router.refresh();
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "เกิดข้อผิดพลาด");
+        return;
       }
+
+      router.push("/login?registered=true");
     } catch {
       setError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
     } finally {
@@ -56,21 +69,13 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-18 h-18 bg-linear-to-br from-emerald-500 to-teal-600 rounded-2xl mb-5 shadow-2xl shadow-emerald-600/25">
             <span className="text-4xl">📊</span>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">ระบบบัญชี</h1>
-          <p className="text-slate-400 text-sm mt-2">เข้าสู่ระบบเพื่อจัดการบัญชีของคุณ</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">สมัครสมาชิก</h1>
+          <p className="text-slate-400 text-sm mt-2">สร้างบัญชีใหม่เพื่อเริ่มต้นใช้งาน</p>
         </div>
 
-        {/* Login Form */}
+        {/* Register Form */}
         <div className="bg-white/7 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Success Message */}
-            {registered && (
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 text-emerald-300 text-sm flex items-center gap-2 font-medium">
-                <span className="text-emerald-400">✅</span>
-                สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ
-              </div>
-            )}
-
             {/* Error Message */}
             {error && (
               <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3 text-rose-300 text-sm flex items-center gap-2 font-medium">
@@ -78,6 +83,25 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
+
+            {/* Name */}
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-slate-300 mb-2"
+              >
+                ชื่อ
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="ชื่อของคุณ"
+                required
+                className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
+              />
+            </div>
 
             {/* Email */}
             <div>
@@ -112,8 +136,9 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="อย่างน้อย 6 ตัวอักษร"
                   required
+                  minLength={6}
                   className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 pr-12"
                 />
                 <button
@@ -122,6 +147,35 @@ export default function LoginPage() {
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors p-1"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-slate-300 mb-2"
+              >
+                ยืนยันรหัสผ่าน
+              </label>
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="กรอกรหัสผ่านอีกครั้ง"
+                  required
+                  minLength={6}
+                  className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors p-1"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
@@ -135,26 +189,26 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  กำลังเข้าสู่ระบบ...
+                  กำลังสมัครสมาชิก...
                 </>
               ) : (
                 <>
-                  <LogIn size={18} />
-                  เข้าสู่ระบบ
+                  <UserPlus size={18} />
+                  สมัครสมาชิก
                 </>
               )}
             </button>
           </form>
 
-          {/* Link to Register */}
+          {/* Link to Login */}
           <div className="mt-6 text-center">
             <p className="text-slate-400 text-sm">
-              ยังไม่มีบัญชี?{" "}
+              มีบัญชีอยู่แล้ว?{" "}
               <Link
-                href="/register"
+                href="/login"
                 className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
               >
-                สมัครสมาชิก
+                เข้าสู่ระบบ
               </Link>
             </p>
           </div>

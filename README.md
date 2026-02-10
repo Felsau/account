@@ -16,7 +16,7 @@
 - **Framework:** Next.js (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
-- **Database:** SQLite + Prisma ORM
+- **Database:** PostgreSQL (Neon Serverless) + Prisma ORM
 - **Auth:** NextAuth.js
 - **Charts:** Recharts
 - **Icons:** Lucide React
@@ -24,15 +24,41 @@
 
 ## 🚀 เริ่มต้นใช้งาน
 
+### 1. ติดตั้ง dependencies
+
 ```bash
-# ติดตั้ง dependencies
 npm install
+```
 
-# สร้างฐานข้อมูล
-npx prisma migrate dev
+### 2. ตั้งค่า Database (Neon PostgreSQL)
 
+โปรเจกต์นี้ใช้ [Neon](https://neon.tech) เป็น cloud PostgreSQL database — ใช้งานได้จากทุกที่โดยไม่ต้องพกไฟล์ database
+
+1. สมัครบัญชีที่ [neon.tech](https://neon.tech) (ฟรี)
+2. สร้าง Project ใหม่
+3. คัดลอก connection string มาใส่ในไฟล์ `.env`:
+
+```bash
+# คัดลอกไฟล์ตัวอย่าง
+cp env.example .env
+```
+
+แก้ไขไฟล์ `.env`:
+
+```env
+DATABASE_URL=postgresql://username:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+NEXTAUTH_SECRET=replace-with-strong-random-string
+NEXTAUTH_URL=http://localhost:3001
+```
+
+### 3. สร้างฐานข้อมูลและรันเซิร์ฟเวอร์
+
+```bash
 # สร้าง Prisma Client
 npx prisma generate
+
+# สร้างตารางในฐานข้อมูล
+npx prisma migrate dev --name init
 
 # (ถ้าต้องการ) เพิ่มข้อมูลเริ่มต้น
 npx prisma db seed
