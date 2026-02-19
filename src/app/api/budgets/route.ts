@@ -34,7 +34,7 @@ export async function GET() {
       (spentByCategory[expense.category] || 0) + expense.amount;
   }
 
-  const budgetWithSpent = budgets.map((b) => ({
+  const budgetWithSpent = budgets.map((b: any) => ({
     ...b,
     spent: spentByCategory[b.category] || 0,
     remaining: b.amount - (spentByCategory[b.category] || 0),
@@ -48,7 +48,7 @@ export async function GET() {
   }));
 
   // สรุป
-  const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
+  const totalBudget = budgets.reduce((sum: number, b: any) => sum + b.amount, 0);
   const totalSpent = Object.values(spentByCategory).reduce(
     (sum, v) => sum + v,
     0

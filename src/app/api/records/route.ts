@@ -40,11 +40,11 @@ export async function GET(req: NextRequest) {
   });
 
   const totalIncome = allRecords
-    .filter((r) => r.type === "income")
-    .reduce((sum, r) => sum + r.amount, 0);
+    .filter((r: any) => r.type === "income")
+    .reduce((sum: number, r: any) => sum + r.amount, 0);
   const totalExpense = allRecords
-    .filter((r) => r.type === "expense")
-    .reduce((sum, r) => sum + r.amount, 0);
+    .filter((r: any) => r.type === "expense")
+    .reduce((sum: number, r: any) => sum + r.amount, 0);
 
   return NextResponse.json({
     records,
