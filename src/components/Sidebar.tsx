@@ -21,6 +21,7 @@ const menuItems = [
   { href: "/dashboard", label: "หน้าหลัก", icon: LayoutDashboard },
   { href: "/add", label: "เพิ่มรายการ", icon: PlusCircle },
   { href: "/history", label: "ประวัติ", icon: List },
+  { href: "/debts", label: "บันทึกหนี้", icon: List },
   { href: "/summary", label: "สรุป", icon: BarChart3 },
   { href: "/budget", label: "งบประมาณ", icon: Target },
 ];

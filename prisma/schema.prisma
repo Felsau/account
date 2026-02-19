@@ -21,6 +21,7 @@ model User {
 
   records Record[]
   budgets Budget[]
+  debts   Debt[]
 }
 
 // รายรับ-รายจ่าย
@@ -51,4 +52,22 @@ model Budget {
   user User @relation(fields: [userId], references: [id])
 
   @@unique([userId, category])
+}
+
+
+// บันทึกหนี้ (ยืม/ให้ยืมเงิน)
+model Debt {
+  id          String   @id @default(cuid())
+  type        String   // borrow = ยืมเงิน, lend = ให้ยืมเงิน
+  amount      Float
+  person      String   // ชื่อคนที่ยืมหรือให้ยืม
+  description String   // รายละเอียด
+  date        DateTime
+  note        String?
+  status      String   // unpaid = ยังไม่คืน, paid = คืนแล้ว
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+
+  user User @relation(fields: [userId], references: [id])
 }
