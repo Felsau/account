@@ -3,33 +3,9 @@
 import { useState, useEffect } from "react";
 import { X, Save, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/categories";
 
-const incomeCategories = [
-  "เงินเดือน",
-  "รายได้เสริม",
-  "ค่าฟรีแลนซ์",
-  "ดอกเบี้ย",
-  "ปันผล",
-  "ของขวัญ/เงินช่วย",
-  "ขายของ",
-  "อื่นๆ",
-];
 
-const expenseCategories = [
-  "อาหาร",
-  "เครื่องดื่ม",
-  "เดินทาง",
-  "ที่พัก",
-  "ค่าน้ำ/ค่าไฟ",
-  "โทรศัพท์/เน็ต",
-  "ของใช้",
-  "เสื้อผ้า",
-  "สุขภาพ",
-  "บันเทิง",
-  "การศึกษา",
-  "ออม/ลงทุน",
-  "อื่นๆ",
-];
 
 interface Record {
   id: string;
@@ -63,7 +39,7 @@ export default function EditRecordModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const categories = type === "income" ? incomeCategories : expenseCategories;
+  const categories = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   // Reset category if type changes and current category is not in the new list
   useEffect(() => {
