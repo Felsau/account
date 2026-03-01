@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, TrendingUp, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/categories";
 
 const incomeCategories = [
   "เงินเดือน",
@@ -44,7 +45,7 @@ export default function AddRecordPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const categories = type === "income" ? incomeCategories : expenseCategories;
+  const categories = type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

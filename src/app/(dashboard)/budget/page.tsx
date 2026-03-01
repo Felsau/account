@@ -82,7 +82,7 @@ export default function BudgetPage() {
   }, [fetchData]);
 
   const existingCategories = budgets.map((b) => b.category);
-  const availableCategories = expenseCategories.filter(
+  const availableCategories = EXPENSE_CATEGORIES.filter(
     (c) => !existingCategories.includes(c)
   );
 
