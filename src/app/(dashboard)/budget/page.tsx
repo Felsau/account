@@ -9,22 +9,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
-
-const expenseCategories = [
-  "อาหาร",
-  "เครื่องดื่ม",
-  "เดินทาง",
-  "ที่พัก",
-  "ค่าน้ำ/ค่าไฟ",
-  "โทรศัพท์/เน็ต",
-  "ของใช้",
-  "เสื้อผ้า",
-  "สุขภาพ",
-  "บันเทิง",
-  "การศึกษา",
-  "ออม/ลงทุน",
-  "อื่นๆ",
-];
+import { EXPENSE_CATEGORIES } from "@/lib/categories";
 
 interface BudgetItem {
   id: string;
@@ -190,17 +175,13 @@ export default function BudgetPage() {
               <button
                 onClick={handleAdd}
                 disabled={saving || !newCategory || !newAmount}
-                className="px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-medium hover:bg-emerald-600 disabled:bg-emerald-300 transition-all duration-200 shadow-sm"
+                className="flex-1 sm:flex-none bg-emerald-500 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-600 disabled:bg-emerald-300 transition-all duration-200 text-sm font-medium"
               >
                 {saving ? "กำลังบันทึก..." : "บันทึก"}
               </button>
               <button
-                onClick={() => {
-                  setShowAdd(false);
-                  setNewCategory("");
-                  setNewAmount("");
-                }}
-                className="px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 transition-all duration-200"
+                onClick={() => setShowAdd(false)}
+                className="flex-1 sm:flex-none bg-gray-100 text-gray-600 px-4 py-2.5 rounded-xl hover:bg-gray-200 transition-all duration-200 text-sm font-medium"
               >
                 ยกเลิก
               </button>
@@ -209,165 +190,76 @@ export default function BudgetPage() {
         </div>
       )}
 
-      {/* Overall Summary */}
-      {budgets.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Target size={18} className="text-blue-500" />
-              <span className="font-semibold text-gray-700">ภาพรวม</span>
-            </div>
-            <span
-              className={cn(
-                "text-sm font-semibold",
-                summary.totalSpent > summary.totalBudget
-                  ? "text-rose-600"
-                  : "text-emerald-600"
-              )}
-            >
-              ใช้ไป {summary.overallPercentage.toFixed(0)}%
-            </span>
-          </div>
-
-          {/* Overall progress bar */}
-          <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-3">
-            <div
-              className={cn(
-                "h-full rounded-full transition-all duration-500",
-                summary.totalSpent > summary.totalBudget
-                  ? "bg-rose-500"
-                  : summary.overallPercentage >= 80
-                    ? "bg-amber-500"
-                    : "bg-emerald-500"
-              )}
-              style={{
-                width: `${Math.min(
-                  (summary.totalSpent / Math.max(summary.totalBudget, 1)) * 100,
-                  100
-                )}%`,
-              }}
-            />
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">
-              ใช้ไป{" "}
-              <span className="font-semibold text-gray-700 tabular-nums">
-                {formatCurrency(summary.totalSpent)}
-              </span>
-            </span>
-            <span className="text-gray-500">
-              จาก{" "}
-              <span className="font-semibold text-gray-700 tabular-nums">
-                {formatCurrency(summary.totalBudget)}
-              </span>
-            </span>
-          </div>
+      {/* Summary */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4">
+          <p className="text-xs text-gray-500 mb-1">งบทั้งหมด</p>
+          <p className="text-lg font-bold text-gray-800 tabular-nums">{formatCurrency(summary.totalBudget)}</p>
         </div>
-      )}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4">
+          <p className="text-xs text-gray-500 mb-1">ใช้ไปแล้ว</p>
+          <p className="text-lg font-bold text-rose-500 tabular-nums">{formatCurrency(summary.totalSpent)}</p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4">
+          <p className="text-xs text-gray-500 mb-1">คงเหลือ</p>
+          <p className={`text-lg font-bold tabular-nums ${summary.totalRemaining >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+            {formatCurrency(summary.totalRemaining)}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4">
+          <p className="text-xs text-gray-500 mb-1">ใช้ไปแล้ว</p>
+          <p className={`text-lg font-bold tabular-nums ${summary.overallPercentage > 100 ? "text-rose-500" : "text-gray-800"}`}>
+            {summary.overallPercentage.toFixed(0)}%
+          </p>
+        </div>
+      </div>
 
-      {/* Budget Items */}
+      {/* Budget List */}
       {budgets.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
-            <Target size={24} className="text-gray-300" />
-          </div>
-          <p className="text-gray-400 font-medium">ยังไม่ได้ตั้งงบประมาณ</p>
-          <p className="text-gray-400 text-sm mt-1">
-            กดปุ่ม &quot;ตั้งงบ&quot; เพื่อเริ่มต้น
-          </p>
+          <Target size={40} className="mx-auto text-gray-300 mb-3" />
+          <p className="text-gray-500 font-medium">ยังไม่มีงบประมาณ</p>
+          <p className="text-gray-400 text-sm mt-1">กดปุ่ม &ldquo;ตั้งงบ&rdquo; เพื่อเริ่มต้น</p>
         </div>
       ) : (
         <div className="space-y-3">
           {budgets.map((budget) => (
-            <div
-              key={budget.id}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-5 hover:shadow-md transition-all duration-200"
-            >
+            <div key={budget.id} className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-5">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
                   {budget.overBudget ? (
-                    <AlertTriangle
-                      size={16}
-                      className="text-rose-500 shrink-0"
-                    />
+                    <AlertTriangle size={18} className="text-rose-500 shrink-0" />
                   ) : budget.percentage >= 80 ? (
-                    <AlertTriangle
-                      size={16}
-                      className="text-amber-500 shrink-0"
-                    />
+                    <AlertTriangle size={18} className="text-amber-500 shrink-0" />
                   ) : (
-                    <CheckCircle2
-                      size={16}
-                      className="text-emerald-500 shrink-0"
-                    />
+                    <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
                   )}
-                  <span className="font-medium text-gray-700">
-                    {budget.category}
-                  </span>
+                  <span className="font-semibold text-gray-800">{budget.category}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={cn(
-                      "text-sm font-semibold tabular-nums",
-                      budget.overBudget
-                        ? "text-rose-600"
-                        : budget.percentage >= 80
-                          ? "text-amber-600"
-                          : "text-emerald-600"
-                    )}
-                  >
-                    {budget.percentage.toFixed(0)}%
-                  </span>
-                  <button
-                    onClick={() => handleDelete(budget.id)}
-                    className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all duration-200"
-                    title="ลบ"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleDelete(budget.id)}
+                  className="p-1.5 hover:bg-rose-50 rounded-lg transition-colors group"
+                >
+                  <Trash2 size={15} className="text-gray-300 group-hover:text-rose-400 transition-colors" />
+                </button>
               </div>
 
-              {/* Progress bar */}
-              <div
-                className={cn(
-                  "w-full h-2.5 rounded-full overflow-hidden mb-2",
-                  getProgressBg(budget.percentage, budget.overBudget)
-                )}
-              >
+              <div className={`w-full h-2 rounded-full mb-3 ${getProgressBg(budget.percentage, budget.overBudget)}`}>
                 <div
-                  className={cn(
-                    "h-full rounded-full transition-all duration-500",
-                    getProgressColor(budget.percentage, budget.overBudget)
-                  )}
-                  style={{
-                    width: `${Math.min(
-                      (budget.spent / Math.max(budget.amount, 1)) * 100,
-                      100
-                    )}%`,
-                  }}
+                  className={`h-2 rounded-full transition-all duration-500 ${getProgressColor(budget.percentage, budget.overBudget)}`}
+                  style={{ width: `${Math.min(budget.percentage, 100)}%` }}
                 />
               </div>
 
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">
-                  ใช้ไป{" "}
-                  <span className="font-medium tabular-nums">
-                    {formatCurrency(budget.spent)}
-                  </span>
-                </span>
-                <span className="text-gray-500">
-                  งบ{" "}
-                  <span className="font-medium tabular-nums">
-                    {formatCurrency(budget.amount)}
-                  </span>
-                </span>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>ใช้ไป <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(budget.spent)}</span></span>
+                <span className="tabular-nums">{budget.percentage.toFixed(0)}%</span>
+                <span>งบ <span className="font-semibold text-gray-700 tabular-nums">{formatCurrency(budget.amount)}</span></span>
               </div>
+
               {budget.overBudget && (
-                <p className="text-xs text-rose-500 mt-1.5 font-medium">
-                  ⚠️ เกินงบ{" "}
-                  {formatCurrency(budget.spent - budget.amount)}
+                <p className="text-xs text-rose-500 font-medium mt-2">
+                  เกินงบ {formatCurrency(Math.abs(budget.remaining))}
                 </p>
               )}
             </div>

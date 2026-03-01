@@ -7,33 +7,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from "@/lib/categories";
 
-const incomeCategories = [
-  "เงินเดือน",
-  "รายได้เสริม",
-  "ค่าฟรีแลนซ์",
-  "ดอกเบี้ย",
-  "ปันผล",
-  "ของขวัญ/เงินช่วย",
-  "ขายของ",
-  "อื่นๆ",
-];
-
-const expenseCategories = [
-  "อาหาร",
-  "เครื่องดื่ม",
-  "เดินทาง",
-  "ที่พัก",
-  "ค่าน้ำ/ค่าไฟ",
-  "โทรศัพท์/เน็ต",
-  "ของใช้",
-  "เสื้อผ้า",
-  "สุขภาพ",
-  "บันเทิง",
-  "การศึกษา",
-  "ออม/ลงทุน",
-  "อื่นๆ",
-];
-
 export default function AddRecordPage() {
   const router = useRouter();
   const [type, setType] = useState<"income" | "expense">("expense");
