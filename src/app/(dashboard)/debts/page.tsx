@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Trash2, Pencil, CheckCircle2, XCircle } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import AddDebtModal from "@/components/AddDebtModal";
+import EditDebtModal from "@/components/EditDebtModal";
 
 interface Debt {
   id: string;
@@ -26,11 +27,13 @@ const statusLabel = {
   paid: "คืนแล้ว",
 };
 
-
 export default function DebtsPage() {
   const [debts, setDebts] = useState<Debt[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [editingDebt, setEditingDebt] = useState<Debt | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -49,6 +52,48 @@ export default function DebtsPage() {
     fetchData();
   }, []);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("ต้องการลบรายการหนี้นี้ใช่ไหม?")) return;
+    setDeletingId(id);
+    try {
+      await fetch(`/api/debts/${id}`, { method: "DELETE" });
+      setDebts((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleToggleStatus = async (debt: Debt) => {
+    const newStatus = debt.status === "unpaid" ? "paid" : "unpaid";
+    setTogglingId(debt.id);
+    try {
+      const res = await fetch(`/api/debts/${debt.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: debt.type,
+          amount: debt.amount,
+          person: debt.person,
+          description: debt.description,
+          date: debt.date,
+          note: debt.note,
+          status: newStatus,
+        }),
+      });
+      if (res.ok) {
+        setDebts((prev) =>
+          prev.map((d) => (d.id === debt.id ? { ...d, status: newStatus } : d))
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between gap-3">
@@ -60,15 +105,15 @@ export default function DebtsPage() {
           <Plus size={18} />
           เพิ่มหนี้
         </button>
-            {showAdd && (
-              <AddDebtModal
-                onClose={() => setShowAdd(false)}
-                onSaved={() => {
-                  setShowAdd(false);
-                  fetchData();
-                }}
-              />
-            )}
+        {showAdd && (
+          <AddDebtModal
+            onClose={() => setShowAdd(false)}
+            onSaved={() => {
+              setShowAdd(false);
+              fetchData();
+            }}
+          />
+        )}
       </div>
 
       {loading ? (
@@ -96,24 +141,54 @@ export default function DebtsPage() {
               </div>
               <div className="flex gap-2 items-center">
                 {debt.status === "unpaid" ? (
-                  <button title="เปลี่ยนเป็นคืนแล้ว" className="p-1.5 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-all">
+                  <button
+                    title="เปลี่ยนเป็นคืนแล้ว"
+                    disabled={togglingId === debt.id}
+                    onClick={() => handleToggleStatus(debt)}
+                    className="p-1.5 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-all disabled:opacity-40"
+                  >
                     <CheckCircle2 size={18} />
                   </button>
                 ) : (
-                  <button title="เปลี่ยนเป็นยังไม่คืน" className="p-1.5 text-amber-500 hover:bg-amber-50 rounded-lg transition-all">
+                  <button
+                    title="เปลี่ยนเป็นยังไม่คืน"
+                    disabled={togglingId === debt.id}
+                    onClick={() => handleToggleStatus(debt)}
+                    className="p-1.5 text-amber-500 hover:bg-amber-50 rounded-lg transition-all disabled:opacity-40"
+                  >
                     <XCircle size={18} />
                   </button>
                 )}
-                <button title="แก้ไข" className="p-1.5 text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all">
+                <button
+                  title="แก้ไข"
+                  onClick={() => setEditingDebt(debt)}
+                  className="p-1.5 text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                >
                   <Pencil size={16} />
                 </button>
-                <button title="ลบ" className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all">
+                <button
+                  title="ลบ"
+                  disabled={deletingId === debt.id}
+                  onClick={() => handleDelete(debt.id)}
+                  className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all disabled:opacity-40"
+                >
                   <Trash2 size={16} />
                 </button>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {editingDebt && (
+        <EditDebtModal
+          debt={editingDebt}
+          onClose={() => setEditingDebt(null)}
+          onSaved={() => {
+            setEditingDebt(null);
+            fetchData();
+          }}
+        />
       )}
     </div>
   );
